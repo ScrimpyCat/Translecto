@@ -74,6 +74,7 @@ defmodule Translecto.Schema.Translation do
             end
         end
     """
+    @spec translation(keyword()) :: Macro.t
     defmacro translation(opts \\ []) do
         case if(opts[:locale], do: opts[:locale], else: Application.fetch_env!(:translecto, :locale)[:schema]) do
             { :model, model } -> quote do: belongs_to :locale, unquote(model)
