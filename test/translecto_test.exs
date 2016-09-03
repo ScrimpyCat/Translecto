@@ -49,6 +49,20 @@ defmodule TranslectoTest do
         assert Model.Ingredient.get_translation(:type) == Model.IngredientTypeTranslation
     end
 
+    test "translate bindings" do
+        locale = 1
+        table = Model.Ingredient
+        query = from i in table,
+            locale: ^locale,
+            translate: name in i.name
+
+        result = from i in Model.Ingredient,
+            join: name in Model.IngredientNameTranslation,
+            where: i.name == name.translate_id and name.locale_id == ^locale
+
+        assert inspect(query) == inspect(result)
+    end
+
     test "translate name" do
         query = from i in Model.Ingredient,
             locale: 1,
@@ -101,6 +115,22 @@ defmodule TranslectoTest do
             join: type in Model.IngredientTypeTranslation,
             where: i.type == type.translate_id and type.locale_id == 1,
             select: { name.term, type.term }
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type with different locales" do
+        query = from i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name,
+            locale: 2,
+            translate: type in i.type
+
+        result = from i in Model.Ingredient,
+            join: name in Model.IngredientNameTranslation,
+            where: i.name == name.translate_id and name.locale_id == 1,
+            join: type in Model.IngredientTypeTranslation,
+            where: i.type == type.translate_id and type.locale_id == 2
 
         assert inspect(query) == inspect(result)
     end
