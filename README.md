@@ -110,10 +110,10 @@ Insertion
 To insert stuff you simply insert the translation data into the translation model using the correct grouping (`:translate_id`, `:locale_id`).
 
 ```elixir
-  content = Repo.insert! Item.Content.Translation.changeset(%Item.Content.Translation{}, %{ locale_id: 1, name: "1_1_name", description: "1_1_desc" })
-  Repo.insert! Item.Content.Translation.changeset(%Item.Content.Translation{}, %{ translate_id: content.translate_id, locale_id: 2, name: "1_2_name", description: "1_2_desc" })
+content = Repo.insert! Item.Content.Translation.changeset(%Item.Content.Translation{}, %{ locale_id: 1, name: "1_1_name", description: "1_1_desc" })
+Repo.insert! Item.Content.Translation.changeset(%Item.Content.Translation{}, %{ translate_id: content.translate_id, locale_id: 2, name: "1_2_name", description: "1_2_desc" })
 
-  Repo.insert! Item.changeset(%Item{}, %{ content: content.translate_id })
+Repo.insert! Item.changeset(%Item{}, %{ content: content.translate_id })
 ```
 
 Querying
