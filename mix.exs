@@ -4,11 +4,13 @@ defmodule Translecto.Mixfile do
     def project do
         [
             app: :translecto,
+            description: "A minimal translation library for Ecto",
             version: "0.0.1",
             elixir: "~> 1.3",
             build_embedded: Mix.env == :prod,
             start_permanent: Mix.env == :prod,
             deps: deps,
+            package: package,
             dialyzer: [plt_add_deps: :transitive]
         ]
     end
@@ -33,6 +35,14 @@ defmodule Translecto.Mixfile do
         [
             { :ecto, "~> 2.0" },
             { :ex_doc, "~> 0.13", only: :dev }
+        ]
+    end
+
+    defp package do
+        [
+            maintainers: ["Stefan Johnson"],
+            licenses: ["BSD 2-Clause"],
+            links: %{ "GitHub" => "https://github.com/ScrimpyCat/Translecto" }
         ]
     end
 end
