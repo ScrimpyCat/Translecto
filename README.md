@@ -127,3 +127,11 @@ from item in Item,
     translate: content in item.content,
     select: { content.name, content.description }
 ```
+
+Installation
+------------
+```elixir
+defp deps do
+    [{ :translecto, "~> 0.0.1" }]
+end
+```
