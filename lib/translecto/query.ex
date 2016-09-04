@@ -2,7 +2,7 @@ defmodule Translecto.Query do
     @moduledoc """
       Provides convenient functionality for querying translatable models.
     """
-    defmacro __using__(options) do
+    defmacro __using__(_options) do
         quote do
             import Translecto.Query
             import Ecto.Query, except: [from: 1, from: 2]

@@ -7,7 +7,7 @@ defmodule Translecto.Schema.Translatable do
       To correctly use this module a schema should call `use Translecto.Schema.Translatable`.
     """
 
-    defmacro __using__(options) do
+    defmacro __using__(_options) do
         quote do
             import Translecto.Schema.Translatable
             import Translecto.Changeset
@@ -51,7 +51,7 @@ defmodule Translecto.Schema.Translatable do
         end
     """
     @spec translatable(atom, module(), keyword()) :: Macro.t
-    defmacro translatable(name, queryable, opts \\ []) do
+    defmacro translatable(name, queryable, _opts \\ []) do
         Module.put_attribute(__CALLER__.module, :translecto_translate, [{ name, queryable }|(Module.get_attribute(__CALLER__.module, :translecto_translate) || [])])
 
         quote do
