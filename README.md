@@ -132,6 +132,6 @@ Installation
 ------------
 ```elixir
 defp deps do
-    [{ :translecto, "~> 0.0.1" }]
+    [{ :translecto, "~> 0.0.3" }]
 end
 ```
