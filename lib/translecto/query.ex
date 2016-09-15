@@ -18,6 +18,13 @@ defmodule Translecto.Query do
         expand_translate_query(kw, tables, locale, [quote do
             { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id == unquote(locale) }
         end, quote do
+            { :left_join, unquote(name) in ^unquote(tables[table]).get_translation(unquote(field)) }
+        end|acc])
+    end
+    defp expand_translate_query([{ :must_translate, { :in, _, [name, { { :., _, [table_name = { table, _, _ }, field] }, _, _ }] } }|kw], tables, locale, acc) do
+        expand_translate_query(kw, tables, locale, [quote do
+            { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id == unquote(locale) }
+        end, quote do
             { :join, unquote(name) in ^unquote(tables[table]).get_translation(unquote(field)) }
         end|acc])
     end
