@@ -58,7 +58,7 @@ defmodule TranslectoTest do
 
         result = from i in Model.Ingredient,
             join: name in Model.IngredientNameTranslation,
-            where: i.name == name.translate_id and name.locale_id == ^locale
+            on: i.name == name.translate_id and name.locale_id == ^locale
 
         assert inspect(query) == inspect(result)
     end
@@ -70,7 +70,7 @@ defmodule TranslectoTest do
 
         result = from i in Model.Ingredient,
             join: name in Model.IngredientNameTranslation,
-            where: i.name == name.translate_id and name.locale_id == 1
+            on: i.name == name.translate_id and name.locale_id == 1
 
         assert inspect(query) == inspect(result)
     end
@@ -82,7 +82,7 @@ defmodule TranslectoTest do
 
         result = from i in Model.Ingredient,
             join: type in Model.IngredientTypeTranslation,
-            where: i.type == type.translate_id and type.locale_id == 1
+            on: i.type == type.translate_id and type.locale_id == 1
 
         assert inspect(query) == inspect(result)
     end
@@ -95,9 +95,9 @@ defmodule TranslectoTest do
 
         result = from i in Model.Ingredient,
             join: name in Model.IngredientNameTranslation,
-            where: i.name == name.translate_id and name.locale_id == 1,
+            on: i.name == name.translate_id and name.locale_id == 1,
             join: type in Model.IngredientTypeTranslation,
-            where: i.type == type.translate_id and type.locale_id == 1
+            on: i.type == type.translate_id and type.locale_id == 1
 
         assert inspect(query) == inspect(result)
     end
@@ -111,9 +111,9 @@ defmodule TranslectoTest do
 
         result = from i in Model.Ingredient,
             join: name in Model.IngredientNameTranslation,
-            where: i.name == name.translate_id and name.locale_id == 1,
+            on: i.name == name.translate_id and name.locale_id == 1,
             join: type in Model.IngredientTypeTranslation,
-            where: i.type == type.translate_id and type.locale_id == 1,
+            on: i.type == type.translate_id and type.locale_id == 1,
             select: { name.term, type.term }
 
         assert inspect(query) == inspect(result)
@@ -128,9 +128,9 @@ defmodule TranslectoTest do
 
         result = from i in Model.Ingredient,
             join: name in Model.IngredientNameTranslation,
-            where: i.name == name.translate_id and name.locale_id == 1,
+            on: i.name == name.translate_id and name.locale_id == 1,
             join: type in Model.IngredientTypeTranslation,
-            where: i.type == type.translate_id and type.locale_id == 2
+            on: i.type == type.translate_id and type.locale_id == 2
 
         assert inspect(query) == inspect(result)
     end
