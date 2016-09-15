@@ -49,12 +49,20 @@ defmodule Translecto.Query do
             translate: name in ingredient.name,
             select: name.term
 
+        \# Get only the ingredients which have english names.
+        from ingredient in Model.Ingredient,
+            locale: ^en.id,
+            must_translate: name in ingredient.name,
+            select: name.term
+
       A translatable query requires a locale to be set using the `:locale` keyword. This value should be
       the locale value that will be matched in the translation model's for `:locale_id` field.
 
-      The `:translate` keyword is used to create access to any translatable terms. It takes the form of
-      an `in` expression where the left argument is the named reference to that translation, and the
-      right argument is the translatable field (field marked as `Translecto.Schema.Translatable.translatable/3`).
+      The `:translate` keyword is used to create access to any translatable terms, if those terms are not
+      available it will return null instead. While `:must_translate` is an alternative keyword that enforces
+      a translation exists. These take the form of an `in` expression where the left argument is the named
+      reference to that translation, and the right argument is the translatable field (field marked as
+      `Translecto.Schema.Translatable.translatable/3`).
 
       After using translate the translatable term(s) for that field are now available throughout the query,
       in the given locale specified.

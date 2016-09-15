@@ -132,8 +132,8 @@ defmodule Translecto do
 
       To simplify querying of translatable fields, the from query syntax has been
       extended to introduce a `:locale` field, and a `:translate` field. The `:locale`
-      field specifies the current `:locale_id`, while the `:translate` field maps
-      a model's translatable field to a new name.
+      field specifies the current `:locale_id`, while the `:translate` or
+      `:must_translate` field maps a model's translatable field to a new name.
 
         from item in Item,
             locale: 1,
