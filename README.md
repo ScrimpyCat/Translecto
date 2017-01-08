@@ -119,8 +119,8 @@ Repo.insert! Item.changeset(%Item{}, %{ content: content.translate_id })
 Querying
 --------
 
-To simplify querying of translatable fields, the from query syntax has been extended to introduce a `:locale` field, and a `:translate` field. The `:locale` field specifies the current `:locale_id`, while the `:translate` or
-`:must_translate` field maps a model's translatable field to a new name.
+To simplify querying of translatable fields, the from query syntax has been
+extended to introduce a `:locale` field, and a `:translate` field. The `:locale` or `:locales` field specifies the current `:locale_id` or list of `:locale_id`'s', while the `:translate` or `:must_translate` field maps a model's translatable field to a new name.
 
 ```elixir
 from item in Item,
