@@ -135,6 +135,92 @@ defmodule TranslectoTest do
         assert inspect(query) == inspect(result)
     end
 
+    test "translate bindings with list of locales" do
+        locale = [1]
+        table = Model.Ingredient
+        query = from i in table,
+            locales: ^locale,
+            translate: name in i.name
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in ^locale
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: name in i.name
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate type with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: type in i.type
+
+        result = from i in Model.Ingredient,
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: name in i.name,
+            translate: type in i.type
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type with referencing translations with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: name in i.name,
+            translate: type in i.type,
+            select: { name.term, type.term }
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1],
+            select: { name.term, type.term }
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type with different list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: name in i.name,
+            locales: [2],
+            translate: type in i.type
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [2]
+
+        assert inspect(query) == inspect(result)
+    end
+
     test "must translate bindings" do
         locale = 1
         table = Model.Ingredient
@@ -217,6 +303,92 @@ defmodule TranslectoTest do
             on: i.name == name.translate_id and name.locale_id == 1,
             join: type in Model.IngredientTypeTranslation,
             on: i.type == type.translate_id and type.locale_id == 2
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "must translate bindings with list of locales" do
+        locale = [1]
+        table = Model.Ingredient
+        query = from i in table,
+            locales: ^locale,
+            must_translate: name in i.name
+
+        result = from i in Model.Ingredient,
+            join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in ^locale
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "must translate name with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            must_translate: name in i.name
+
+        result = from i in Model.Ingredient,
+            join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "must translate type with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            must_translate: type in i.type
+
+        result = from i in Model.Ingredient,
+            join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "must translate name and type with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            must_translate: name in i.name,
+            must_translate: type in i.type
+
+        result = from i in Model.Ingredient,
+            join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "must translate name and type with referencing translations with list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            must_translate: name in i.name,
+            must_translate: type in i.type,
+            select: { name.term, type.term }
+
+        result = from i in Model.Ingredient,
+            join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1],
+            select: { name.term, type.term }
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "must translate name and type with different list of locales" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            must_translate: name in i.name,
+            locales: [2],
+            must_translate: type in i.type
+
+        result = from i in Model.Ingredient,
+            join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [2]
 
         assert inspect(query) == inspect(result)
     end

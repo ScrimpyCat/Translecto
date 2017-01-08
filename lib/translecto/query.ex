@@ -14,16 +14,30 @@ defmodule Translecto.Query do
     defp expand_translate_query(kw, tables, locale \\ 1), do: Enum.reverse(expand_translate_query(kw, tables, locale, []))
 
     defp expand_translate_query([], _, _, acc), do: acc
-    defp expand_translate_query([{ :translate, { :in, _, [name, { { :., _, [table_name = { table, _, _ }, field] }, _, _ }] } }|kw], tables, locale, acc) do
+    defp expand_translate_query([{ :translate, { :in, _, [name, { { :., _, [table_name = { table, _, _ }, field] }, _, _ }] } }|kw], tables, locale = { :locale, locale_id }, acc) do
         expand_translate_query(kw, tables, locale, [quote do
-            { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id == unquote(locale) }
+            { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id == unquote(locale_id) }
         end, quote do
             { :left_join, unquote(name) in ^unquote(tables[table]).get_translation(unquote(field)) }
         end|acc])
     end
-    defp expand_translate_query([{ :must_translate, { :in, _, [name, { { :., _, [table_name = { table, _, _ }, field] }, _, _ }] } }|kw], tables, locale, acc) do
+    defp expand_translate_query([{ :translate, { :in, _, [name, { { :., _, [table_name = { table, _, _ }, field] }, _, _ }] } }|kw], tables, locale = { :locales, locale_ids }, acc) do
         expand_translate_query(kw, tables, locale, [quote do
-            { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id == unquote(locale) }
+            { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id in unquote(locale_ids) }
+        end, quote do
+            { :left_join, unquote(name) in ^unquote(tables[table]).get_translation(unquote(field)) }
+        end|acc])
+    end
+    defp expand_translate_query([{ :must_translate, { :in, _, [name, { { :., _, [table_name = { table, _, _ }, field] }, _, _ }] } }|kw], tables, locale = { :locale, locale_id }, acc) do
+        expand_translate_query(kw, tables, locale, [quote do
+            { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id == unquote(locale_id) }
+        end, quote do
+            { :join, unquote(name) in ^unquote(tables[table]).get_translation(unquote(field)) }
+        end|acc])
+    end
+    defp expand_translate_query([{ :must_translate, { :in, _, [name, { { :., _, [table_name = { table, _, _ }, field] }, _, _ }] } }|kw], tables, locale = { :locales, locale_ids }, acc) do
+        expand_translate_query(kw, tables, locale, [quote do
+            { :on, unquote(table_name).unquote(field) == unquote(name).translate_id and unquote(name).locale_id in unquote(locale_ids) }
         end, quote do
             { :join, unquote(name) in ^unquote(tables[table]).get_translation(unquote(field)) }
         end|acc])
@@ -31,7 +45,8 @@ defmodule Translecto.Query do
     defp expand_translate_query([expr = { :join, table }|kw], tables, locale, acc) do
         expand_translate_query(kw, [get_table(table)|tables], locale, [expr|acc])
     end
-    defp expand_translate_query([{ :locale, locale }|kw], tables, _, acc), do: expand_translate_query(kw, tables, locale, acc)
+    defp expand_translate_query([locale = { :locale, _ }|kw], tables, _, acc), do: expand_translate_query(kw, tables, locale, acc)
+    defp expand_translate_query([locale = { :locales, _ }|kw], tables, _, acc), do: expand_translate_query(kw, tables, locale, acc)
     defp expand_translate_query([expr|kw], tables, locale, acc), do: expand_translate_query(kw, tables, locale, [expr|acc])
 
     @doc """
@@ -55,8 +70,16 @@ defmodule Translecto.Query do
             must_translate: name in ingredient.name,
             select: name.term
 
+        \# Get the english and french names for all ingredients.
+        from ingredient in Model.Ingredient,
+            locales: ^[en.id, fr.id],
+            translate: name in ingredient.name,
+            select: name.term
+
       A translatable query requires a locale to be set using the `:locale` keyword. This value should be
-      the locale value that will be matched in the translation model's for `:locale_id` field.
+      the locale value that will be matched in the translation model's for `:locale_id` field. Alternatively
+      a list of locales can be matched against using the keywork `:locales`, where a list of locale values
+      is provided.
 
       The `:translate` keyword is used to create access to any translatable terms, if those terms are not
       available it will return null instead. While `:must_translate` is an alternative keyword that enforces
