@@ -17,7 +17,7 @@ defmodule TranslectoTest do
             use Translecto.Schema.Translation
 
             schema "ingredient_name_translations" do
-                translation
+                translation()
                 field :term, :string
             end
         end
@@ -27,7 +27,7 @@ defmodule TranslectoTest do
             use Translecto.Schema.Translation
 
             schema "ingredient_type_translations" do
-                translation
+                translation()
                 field :term, :string
             end
         end
