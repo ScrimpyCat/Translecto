@@ -66,7 +66,7 @@ defmodule Translecto do
                 timestamps
             end
 
-            def changeset(struct, params \\ %{}) do
+            def changeset(struct, params \\\\ %{}) do
                 struct
                 |> translation_changeset(params)
                 |> cast(params, [:name, :description])
@@ -107,7 +107,7 @@ defmodule Translecto do
                 timestamps
             end
 
-            def changeset(struct, params \\ %{}) do
+            def changeset(struct, params \\\\ %{}) do
                 struct
                 |> translatable_changeset(params, [:content])
                 |> validate_required([:content])
@@ -132,7 +132,7 @@ defmodule Translecto do
 
       To simplify querying of translatable fields, the from query syntax has been
       extended to introduce a `:locale` field, and a `:translate` field. The `:locale`
-      or `:locales` field specifies the current `:locale_id` or list of `:locale_id`'s',
+      or `:locales` field specifies the current `:locale_id` or list of `:locale_id`'s,
       while the `:translate` or `:must_translate` field maps a model's translatable
       field to a new name.
 
