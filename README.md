@@ -120,7 +120,7 @@ Querying
 --------
 
 To simplify querying of translatable fields, the from query syntax has been
-extended to introduce a `:locale` field, and a `:translate` field. The `:locale` or `:locales` field specifies the current `:locale_id` or list of `:locale_id`'s', while the `:translate` or `:must_translate` field maps a model's translatable field to a new name.
+extended to introduce a `:locale` field, and a `:translate` field. The `:locale` or `:locales` field specifies the current `:locale_id` or list of `:locale_id`'s, while the `:translate` or `:must_translate` field maps a model's translatable field to a new name.
 
 ```elixir
 from item in Item,
@@ -133,6 +133,6 @@ Installation
 ------------
 ```elixir
 defp deps do
-    [{ :translecto, "~> 0.2.0" }]
+    [{ :translecto, "~> 0.2.1" }]
 end
 ```
