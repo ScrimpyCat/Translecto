@@ -53,6 +53,13 @@ defmodule TranslectoTest do
             end
         end
 
+        defmodule Item do
+            use Ecto.Schema
+
+            schema "items" do
+                belongs_to :ingredient, Ingredient
+            end
+        end
     end
 
     test "get_translation" do
@@ -544,6 +551,132 @@ defmodule TranslectoTest do
             on: i.desc == desc.translate_id and desc.locale_id in [1, 2, 3],
             where: name.locale_id in [1, nil] and type.locale_id in [1, nil] or name.locale_id in [2, nil] and type.locale_id in [2, nil] or name.locale_id in [3, nil] and type.locale_id in [3, nil],
             where: type.locale_id in [1, nil] and desc.locale_id in [1, nil] or type.locale_id in [2, nil] and desc.locale_id in [2, nil] or type.locale_id in [3, nil] and desc.locale_id in [3, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate and match" do
+        query = from i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name,
+            where: name.term in ["foo", "bar"]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1,
+            where: name.term in ["foo", "bar"]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from join" do
+        query = from t in Model.Item,
+            join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from inner_join" do
+        query = from t in Model.Item,
+            inner_join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            inner_join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from left_join" do
+        query = from t in Model.Item,
+            left_join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            left_join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from right_join" do
+        query = from t in Model.Item,
+            right_join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            right_join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from cross_join" do
+        query = from t in Model.Item,
+            cross_join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            cross_join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from full_join" do
+        query = from t in Model.Item,
+            full_join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            full_join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from inner_lateral_join" do
+        query = from t in Model.Item,
+            inner_lateral_join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            inner_lateral_join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate from left_lateral_join" do
+        query = from t in Model.Item,
+            left_lateral_join: i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name
+
+        result = from t in Model.Item,
+            left_lateral_join: i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1
 
         assert inspect(query) == inspect(result)
     end

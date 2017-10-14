@@ -42,7 +42,7 @@ defmodule Translecto.Query do
             { :join, unquote(name) in ^unquote(tables[table]).get_translation(unquote(field)) }
         end|acc])
     end
-    defp expand_translate_query([expr = { :join, table }|kw], tables, locale, acc) do
+    defp expand_translate_query([expr = { join, table }|kw], tables, locale, acc) when join in [:join, :inner_join, :left_join, :right_join, :cross_join, :full_join, :inner_lateral_join, :left_lateral_join] do
         expand_translate_query(kw, [get_table(table)|tables], locale, [expr|acc])
     end
     defp expand_translate_query([{ :locale_match, translations }|kw], tables, locale = { :locale, locale_id }, acc) do
