@@ -140,5 +140,7 @@ defmodule Translecto do
             locale: 1,
             translate: content in item.content,
             select: { content.name, content.description }
+
+      For more info on the type of fields see `Translecto.Query.from/2`.
     """
 end

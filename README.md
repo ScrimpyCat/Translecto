@@ -129,6 +129,8 @@ from item in Item,
     select: { content.name, content.description }
 ```
 
+For more info on the type of fields see `Translecto.Query.from/2`.
+
 Installation
 ------------
 ```elixir

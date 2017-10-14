@@ -32,6 +32,16 @@ defmodule TranslectoTest do
             end
         end
 
+        defmodule IngredientDescTranslation do
+            use Ecto.Schema
+            use Translecto.Schema.Translation
+
+            schema "ingredient_desc_translations" do
+                translation()
+                field :term, :string
+            end
+        end
+
         defmodule Ingredient do
             use Ecto.Schema
             use Translecto.Schema.Translatable
@@ -39,6 +49,7 @@ defmodule TranslectoTest do
             schema "ingredients" do
                 translatable :name, IngredientNameTranslation
                 translatable :type, IngredientTypeTranslation
+                translatable :desc, IngredientDescTranslation
             end
         end
 
@@ -389,6 +400,150 @@ defmodule TranslectoTest do
             on: i.name == name.translate_id and name.locale_id in [1],
             join: type in Model.IngredientTypeTranslation,
             on: i.type == type.translate_id and type.locale_id in [2]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name with locale enforcing same locale was applied" do
+        query = from i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name,
+            locale_match: [name]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1,
+            where: name.locale_id in [1, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type with locale enforcing same locale was applied" do
+        query = from i in Model.Ingredient,
+            locale: 1,
+            translate: name in i.name,
+            translate: type in i.type,
+            locale_match: [name, type]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == 1,
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id == 1,
+            where: name.locale_id in [1, nil] and type.locale_id in [1, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name with list of locales enforcing same locale was applied" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: name in i.name,
+            locale_match: [name]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            where: name.locale_id in [1, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type with list of locales enforcing same locale was applied" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: name in i.name,
+            translate: type in i.type,
+            locale_match: [name, type]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1],
+            where: name.locale_id in [1, nil] and type.locale_id in [1, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type and desc with list of locales enforcing same locale was applied" do
+        query = from i in Model.Ingredient,
+            locales: [1],
+            translate: name in i.name,
+            translate: type in i.type,
+            translate: desc in i.desc,
+            locale_match: [name, type, desc]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1],
+            left_join: desc in Model.IngredientDescTranslation,
+            on: i.desc == desc.translate_id and desc.locale_id in [1],
+            where: name.locale_id in [1, nil] and type.locale_id in [1, nil] and desc.locale_id in [1, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type and desc with list of different locales enforcing same locale was applied" do
+        query = from i in Model.Ingredient,
+            locales: [1, 2],
+            translate: name in i.name,
+            translate: type in i.type,
+            translate: desc in i.desc,
+            locale_match: [name, type, desc]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1, 2],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1, 2],
+            left_join: desc in Model.IngredientDescTranslation,
+            on: i.desc == desc.translate_id and desc.locale_id in [1, 2],
+            where: name.locale_id in [1, nil] and type.locale_id in [1, nil] and desc.locale_id in [1, nil] or name.locale_id in [2, nil] and type.locale_id in [2, nil] and desc.locale_id in [2, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type and desc with list of many different locales enforcing same locale was applied" do
+        query = from i in Model.Ingredient,
+            locales: [1, 2, 3],
+            translate: name in i.name,
+            translate: type in i.type,
+            translate: desc in i.desc,
+            locale_match: [name, type, desc]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1, 2, 3],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1, 2, 3],
+            left_join: desc in Model.IngredientDescTranslation,
+            on: i.desc == desc.translate_id and desc.locale_id in [1, 2, 3],
+            where: name.locale_id in [1, nil] and type.locale_id in [1, nil] and desc.locale_id in [1, nil] or name.locale_id in [2, nil] and type.locale_id in [2, nil] and desc.locale_id in [2, nil] or name.locale_id in [3, nil] and type.locale_id in [3, nil] and desc.locale_id in [3, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate name and type and desc with list of many different locales enforcing multiple same locale was applied" do
+        query = from i in Model.Ingredient,
+            locales: [1, 2, 3],
+            translate: name in i.name,
+            translate: type in i.type,
+            translate: desc in i.desc,
+            locale_match: [name, type],
+            locale_match: [type, desc]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in [1, 2, 3],
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in [1, 2, 3],
+            left_join: desc in Model.IngredientDescTranslation,
+            on: i.desc == desc.translate_id and desc.locale_id in [1, 2, 3],
+            where: name.locale_id in [1, nil] and type.locale_id in [1, nil] or name.locale_id in [2, nil] and type.locale_id in [2, nil] or name.locale_id in [3, nil] and type.locale_id in [3, nil],
+            where: type.locale_id in [1, nil] and desc.locale_id in [1, nil] or type.locale_id in [2, nil] and desc.locale_id in [2, nil] or type.locale_id in [3, nil] and desc.locale_id in [3, nil]
 
         assert inspect(query) == inspect(result)
     end
