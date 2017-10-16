@@ -425,6 +425,22 @@ defmodule TranslectoTest do
         assert inspect(query) == inspect(result)
     end
 
+    test "translate bindings with locale enforcing same locale was applied" do
+        locale = 1
+        table = Model.Ingredient
+        query = from i in table,
+            locale: ^locale,
+            translate: name in i.name,
+            locale_match: [name]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id == ^locale,
+            where: name.locale_id in [^locale, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
     test "translate name and type with locale enforcing same locale was applied" do
         query = from i in Model.Ingredient,
             locale: 1,
