@@ -55,6 +55,19 @@ defmodule Translecto.Query do
     defp expand_translate_query([locale = { :locales, _ }|kw], tables, _, acc), do: expand_translate_query(kw, tables, locale, acc)
     defp expand_translate_query([expr|kw], tables, locale, acc), do: expand_translate_query(kw, tables, locale, [expr|acc])
 
+    @spec permutate(list, integer, (([any] -> [any]))) :: [any]
+    defp permutate(list, reductions \\ 0, fun \\ fn e -> e end) when reductions <= length(list), do: permutate(list, [], Enum.count(list) - reductions, list, [], fun)
+
+    defp permutate(_, acc, 0, _, _, fun), do: fun.(acc)
+    defp permutate([h|t], acc, n, list, gacc, fun) do
+        [permutate(list, [h|acc], n - 1, list, gacc, fun)|permutate(t, acc, n, list, gacc, fun)]
+    end
+    defp permutate([], _, _, _, gacc, _), do: gacc
+
+    defp valid?([nil|t], [used|list]), do: if(Enum.all?(t, &(&1 != used)), do: valid?(t, list), else: false)
+    defp valid?([h|t], [_|list]), do: if(h not in list, do: valid?(t, list), else: false)
+    defp valid?(_, _), do: true
+
     defp build_locale_matcher(tables, locales, acc) do
         [{ :where, Enum.map(locales, fn locale ->
             Enum.map(tables, fn table ->
