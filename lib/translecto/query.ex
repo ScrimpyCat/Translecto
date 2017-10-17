@@ -68,6 +68,12 @@ defmodule Translecto.Query do
     defp valid?([h|t], [_|list]), do: if(h not in list, do: valid?(t, list), else: false)
     defp valid?(_, _), do: true
 
+    defp flatten(list, level \\ 0), do: Enum.reverse(flatten(list, [], Enum.count(list), level))
+
+    defp flatten([], list, _, _), do: list
+    defp flatten(e, list, n, n), do: [e|list]
+    defp flatten([h|t], list, n, level), do: flatten(t, flatten(h, list, n - 1, level), n, level)
+
     defp build_locale_matcher(tables, locales, acc) do
         [{ :where, Enum.map(locales, fn locale ->
             Enum.map(tables, fn table ->
