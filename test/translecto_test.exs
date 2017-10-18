@@ -472,6 +472,22 @@ defmodule TranslectoTest do
         assert inspect(query) == inspect(result)
     end
 
+    test "translate binding name with list of locales enforcing same locale was applied" do
+        locale = [1]
+        table = Model.Ingredient
+        query = from i in table,
+            locales: ^locale,
+            translate: name in i.name,
+            locale_match: [name]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in ^locale,
+            where: [name.locale_id] in [[name.locale_id]]
+
+        assert inspect(query) == inspect(result)
+    end
+
     test "translate name and type with list of locales enforcing same locale was applied" do
         query = from i in Model.Ingredient,
             locales: [1],
@@ -485,6 +501,25 @@ defmodule TranslectoTest do
             left_join: type in Model.IngredientTypeTranslation,
             on: i.type == type.translate_id and type.locale_id in [1],
             where: name.locale_id in [1, nil] and type.locale_id in [1, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate binding name and type with list of locales enforcing same locale was applied" do
+        locale = [1]
+        table = Model.Ingredient
+        query = from i in table,
+            locales: ^locale,
+            translate: name in i.name,
+            translate: type in i.type,
+            locale_match: [name, type]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in ^locale,
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in ^locale,
+            where: [name.locale_id, type.locale_id] in [[name.locale_id, nil], [name.locale_id, name.locale_id], [nil, type.locale_id]]
 
         assert inspect(query) == inspect(result)
     end
@@ -505,6 +540,36 @@ defmodule TranslectoTest do
             left_join: desc in Model.IngredientDescTranslation,
             on: i.desc == desc.translate_id and desc.locale_id in [1],
             where: name.locale_id in [1, nil] and type.locale_id in [1, nil] and desc.locale_id in [1, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate binding name and type and desc with list of locales enforcing same locale was applied" do
+        locale = [1]
+        table = Model.Ingredient
+        query = from i in table,
+            locales: ^locale,
+            translate: name in i.name,
+            translate: type in i.type,
+            translate: desc in i.desc,
+            locale_match: [name, type, desc]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in ^locale,
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in ^locale,
+            left_join: desc in Model.IngredientDescTranslation,
+            on: i.desc == desc.translate_id and desc.locale_id in ^locale,
+            where: [name.locale_id, type.locale_id, desc.locale_id] in [
+                [name.locale_id, nil, nil],
+                [name.locale_id, name.locale_id, nil],
+                [nil, type.locale_id, nil],
+                [name.locale_id, nil, name.locale_id],
+                [name.locale_id, name.locale_id, name.locale_id],
+                [nil, type.locale_id, type.locale_id],
+                [nil, nil, desc.locale_id]
+            ]
 
         assert inspect(query) == inspect(result)
     end
@@ -567,6 +632,30 @@ defmodule TranslectoTest do
             on: i.desc == desc.translate_id and desc.locale_id in [1, 2, 3],
             where: name.locale_id in [1, nil] and type.locale_id in [1, nil] or name.locale_id in [2, nil] and type.locale_id in [2, nil] or name.locale_id in [3, nil] and type.locale_id in [3, nil],
             where: type.locale_id in [1, nil] and desc.locale_id in [1, nil] or type.locale_id in [2, nil] and desc.locale_id in [2, nil] or type.locale_id in [3, nil] and desc.locale_id in [3, nil]
+
+        assert inspect(query) == inspect(result)
+    end
+
+    test "translate binding name and type and desc with list of many different locales enforcing multiple same locale was applied" do
+        locale = [1, 2, 3]
+        table = Model.Ingredient
+        query = from i in table,
+            locales: ^locale,
+            translate: name in i.name,
+            translate: type in i.type,
+            translate: desc in i.desc,
+            locale_match: [name, type],
+            locale_match: [type, desc]
+
+        result = from i in Model.Ingredient,
+            left_join: name in Model.IngredientNameTranslation,
+            on: i.name == name.translate_id and name.locale_id in ^locale,
+            left_join: type in Model.IngredientTypeTranslation,
+            on: i.type == type.translate_id and type.locale_id in ^locale,
+            left_join: desc in Model.IngredientDescTranslation,
+            on: i.desc == desc.translate_id and desc.locale_id in ^locale,
+            where: [name.locale_id, type.locale_id] in [[name.locale_id, nil], [name.locale_id, name.locale_id], [nil, type.locale_id]],
+            where: [type.locale_id, desc.locale_id] in [[type.locale_id, nil], [type.locale_id, type.locale_id], [nil, desc.locale_id]]
 
         assert inspect(query) == inspect(result)
     end
