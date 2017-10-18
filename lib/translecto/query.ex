@@ -74,6 +74,32 @@ defmodule Translecto.Query do
     defp flatten(e, list, n, n), do: [e|list]
     defp flatten([h|t], list, n, level), do: flatten(t, flatten(h, list, n - 1, level), n, level)
 
+    defp get_field(nil, _), do: nil
+    defp get_field(name, field) do
+        quote do
+            unquote(name).unquote(field)
+        end
+    end
+
+    defp build_locale_matcher(tables, { :^, _, _ }, acc) do
+        [{ :where, quote do
+            unquote(Enum.map(tables, &get_field(&1, :locale_id))) in unquote(permutate([nil|tables], 1, fn e ->
+                Enum.uniq(e)
+                |> Enum.filter(&(&1 != nil))
+                |> Enum.count
+                |> case do
+                    1 -> if(valid?(e, tables), do: e, else: [])
+                    _ -> []
+                end
+            end)
+            |> flatten(1)
+            |> Enum.map(fn match ->
+                quote do
+                    unquote(Enum.map(match, &get_field(&1, :locale_id)))
+                end
+            end))
+        end }|acc]
+    end
     defp build_locale_matcher(tables, locales, acc) do
         [{ :where, Enum.map(locales, fn locale ->
             Enum.map(tables, fn table ->
