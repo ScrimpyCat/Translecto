@@ -65,6 +65,15 @@ defmodule TranslectoTest do
     test "get_translation" do
         assert Model.Ingredient.get_translation(:name) == Model.IngredientNameTranslation
         assert Model.Ingredient.get_translation(:type) == Model.IngredientTypeTranslation
+        assert Model.Ingredient.get_translation(:desc) == Model.IngredientDescTranslation
+    end
+
+    test "get translations and field names" do
+        assert Enum.sort(Model.Ingredient.translations) == Enum.sort([
+            { :name, Model.IngredientNameTranslation },
+            { :type, Model.IngredientTypeTranslation },
+            { :desc, Model.IngredientDescTranslation }
+        ])
     end
 
     test "translate bindings" do
