@@ -5,7 +5,7 @@ defmodule Translecto.Mixfile do
         [
             app: :translecto,
             description: "A minimal translation library for Ecto",
-            version: "0.3.1",
+            version: "0.3.2",
             elixir: "~> 1.3",
             build_embedded: Mix.env == :prod,
             start_permanent: Mix.env == :prod,
