@@ -35,7 +35,9 @@ defmodule Translecto.Mixfile do
         [
             { :ecto, ">= 2.0.0 and < 4.0.0" },
             { :ecto_sql, "~> 3.0", optional: true },
-            { :ex_doc, "~> 0.13", only: :dev }
+            { :ex_doc, "~> 0.13", only: :dev },
+            { :simple_markdown, "~> 0.5.3", only: :dev, runtime: false },
+            { :ex_doc_simple_markdown, "~> 0.3", only: :dev, runtime: false }
         ]
     end
 
