@@ -30,7 +30,7 @@ defmodule Repo.Migrations.CreateItem.Content.Translations do
 
     def change do
         create table(:item_content_translations, primary_key: false) do
-            translation
+            translation()
 
             add :name, :string,
                 null: false
@@ -38,7 +38,7 @@ defmodule Repo.Migrations.CreateItem.Content.Translations do
             add :description, :string,
                 null: false
 
-            timestamps
+            timestamps()
         end
     end
 end
@@ -47,11 +47,11 @@ defmodule Item.Content.Translation do
     use Ecto.Schema
     use Translecto.Schema.Translation
 
-    schema "food_diet_list" do
-        translation
+    schema "item_content_translations" do
+        translation()
         field :name, :string
         field :description, :string
-        timestamps
+        timestamps()
     end
 
     def changeset(struct, params \\ %{}) do
@@ -80,7 +80,7 @@ defmodule Repo.Migrations.CreateItem do
 
             # ... other fields
 
-            timestamps
+            timestamps()
         end
     end
 end
@@ -92,7 +92,7 @@ defmodule Item do
     schema "items" do
         translatable :content, Item.Content.Translation
         # ... other fields
-        timestamps
+        timestamps()
     end
 
     def changeset(struct, params \\ %{}) do
@@ -119,8 +119,7 @@ Repo.insert! Item.changeset(%Item{}, %{ content: content.translate_id })
 Querying
 --------
 
-To simplify querying of translatable fields, the from query syntax has been
-extended to introduce a `:locale` field, and a `:translate` field. The `:locale` or `:locales` field specifies the current `:locale_id` or list of `:locale_id`'s, while the `:translate` or `:must_translate` field maps a model's translatable field to a new name.
+To simplify querying of translatable fields, the from query syntax has been extended to introduce a `:locale` field, and a `:translate` field. The `:locale` or `:locales` field specifies the current `:locale_id` or list of `:locale_id`'s, while the `:translate` or `:must_translate` field maps a model's translatable field to a new name.
 
 ```elixir
 from item in Item,
